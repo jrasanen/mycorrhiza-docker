@@ -72,5 +72,7 @@ jobs:
         context: ./mycorrhiza
         file: ./mycorrhiza/Dockerfile
         push: true
-        tags: ${{ env.DOCKERHUB_REPO }}:${{ steps.mycorrhiza_release.outputs.tag }}
+        tags: |
+          ${{ env.DOCKERHUB_REPO }}:${{ steps.mycorrhiza_release.outputs.tag }}
+          ${{ env.DOCKERHUB_REPO }}:latest
         platforms: linux/amd64,linux/arm64
