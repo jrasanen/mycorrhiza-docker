@@ -33,46 +33,48 @@ jobs:
     - name: Check if the tag exists on Docker Hub
       id: dockerhub_check
       run: |
-        TAG=${{ steps.mycorrhiza_release.outputs.tag }}
-        TAG_EXISTS=$(curl -s -f "https://hub.docker.com/v2/repositories/${DOCKERHUB_REPO}/tags/${TAG}/" > /dev/null; echo $?)
+        TAG=${{ steps.mycorrhiza_release.outputs.latest_release }}
+        TAG_EXISTS=$(curl -s -f "https://hub.docker.com/v2/repositories/${DOCKERHUB_REPO}/tags/${TAG}/" > /dev/null && echo "true" || echo "false")
         
         echo "tag_exists=$TAG_EXISTS" >> $GITHUB_OUTPUT
 
-        if [ "$TAG_EXISTS" == "0" ]; then
+        if [ "$TAG_EXISTS" == "true" ]; then
           echo "Tag $TAG exists on Docker Hub. Exiting workflow."
+        else
+          echo "Tag $TAG does not exist on Docker Hub. Proceeding with build."
         fi
 
     - name: Check out mycorrhiza repository at the latest tag
-      if: steps.dockerhub_check.outputs.tag_exists != '0'
+      if: steps.dockerhub_check.outputs.tag_exists != 'true'
       uses: actions/checkout@v4
       with:
         repository: bouncepaw/mycorrhiza
-        ref: ${{ steps.mycorrhiza_release.outputs.tag }}
+        ref: ${{ steps.mycorrhiza_release.outputs.latest_release }}
         path: "mycorrhiza"
 
     - name: Copy our Dockerfile into mycorrhiza context
-      if: steps.dockerhub_check.outputs.tag_exists != '0'
+      if: steps.dockerhub_check.outputs.tag_exists != 'true'
       run: cp Dockerfile mycorrhiza/Dockerfile
 
     - name: Set up Docker Buildx
-      if: steps.dockerhub_check.outputs.tag_exists != '0'
+      if: steps.dockerhub_check.outputs.tag_exists != 'true'
       uses: docker/setup-buildx-action@v3
 
     - name: Log in to Docker Hub
-      if: steps.dockerhub_check.outputs.tag_exists != '0'
+      if: steps.dockerhub_check.outputs.tag_exists != 'true'
       uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: Build and Push
-      if: steps.dockerhub_check.outputs.tag_exists != '0'
+      if: steps.dockerhub_check.outputs.tag_exists != 'true'
       uses: docker/build-push-action@v5
       with:
         context: ./mycorrhiza
         file: ./mycorrhiza/Dockerfile
         push: true
         tags: |
-          ${{ env.DOCKERHUB_REPO }}:${{ steps.mycorrhiza_release.outputs.tag }}
+          ${{ env.DOCKERHUB_REPO }}:${{ steps.mycorrhiza_release.outputs.latest_release }}
           ${{ env.DOCKERHUB_REPO }}:latest
         platforms: linux/amd64,linux/arm64
