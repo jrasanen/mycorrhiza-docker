@@ -7,4 +7,4 @@ Mycorrhiza is a ailesystem and git-based wiki engine for the independent web wri
 
 # This Git repository?
 
-This Git repository builds the latest tags from Mycorrhiza's repository and releases them on [DockerHub](https://hub.docker.com/repository/docker/jrasanen/mycorrhiza-docker/)
+This Git repository builds the latest tags from Mycorrhiza's repository and releases them on [DockerHub](https://hub.docker.com/repository/docker/jrasanen/mycorrhiza/)
