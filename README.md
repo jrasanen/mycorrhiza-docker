@@ -1,6 +1,6 @@
 ﻿# Mycorrhiza
 
-Mycorrhiza is a ailesystem and git-based wiki engine for the independent web written in Go using Mycomarkup as its primary markup language.
+Mycorrhiza is a filesystem and git-based wiki engine for the independent web written in Go using Mycomarkup as its primary markup language.
 
 * [GitHub](https://github.com/bouncepaw/mycorrhiza)
 * [Site](https://mycorrhiza.wiki/)
